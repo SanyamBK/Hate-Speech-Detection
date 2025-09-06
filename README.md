@@ -1,33 +1,55 @@
-# Hate Speech Detection Using Neural Networks
+# Hate Speech Detection
 
-Project summary
+### Overview
 
-This repository contains an end-to-end solution for detecting hate speech in text using neural network models. The project was developed for the CodeChef Weekend Dev Challenge 14: "DL Projects". It includes data cleaning, preprocessing, model training, and a saved model artifact for inference.
+This project implements a text-classification pipeline to categorize short social media posts (tweets) into one of three classes:
 
-Contents
+- Hate Speech (0)
+- Offensive Language (1)
+- Neither / Neutral (2)
 
-- `main.ipynb` — exploratory analysis and experiment notes.
+This is a multiclass classification problem. The solution includes data exploration, cleaning and preprocessing, model training using a neural network, and a saved model artifact for inference.
+
+### Contest
+
+Developed for CodeChef Weekend Dev Challenge 14: "DL Projects" (attempted on 6 Sep 2025).
+
+## Repository layout
+
+- `main.ipynb` — exploratory analysis and experiment log.
 - Part 1/
-  - `main.py` — initial data loading and preprocessing for the raw dataset.
-  - `hate_speech.csv` — original dataset sample.
+  - `main.py` — data loading and initial EDA.
+  - `hate_speech.csv` — original raw dataset (columns: `tweet`, `class`).
 - Part 2/
-  - `main.py` — data cleaning and text preprocessing pipeline; produces `cleaned_hate_dataset.csv`.
-  - `hate_dataset.csv`, `cleaned_hate_dataset.csv` — intermediate and cleaned datasets.
+  - `main.py` — data cleaning and preprocessing pipeline; outputs `cleaned_hate_dataset.csv`.
+  - `hate_dataset.csv` — intermediate dataset.
 - Part 3/
-  - `main.py` — final model training, evaluation, and inference utilities.
-  - `hate_speech_model.pkl` — serialized trained model for inference.
-  - `cleaned_hate_dataset.csv` — dataset used for final training.
+  - `main.py` — model definition, training, evaluation, and inference utilities.
+  - `cleaned_hate_dataset.csv` — final cleaned dataset used for training.
+  - `hate_speech_model.pkl` — serialized trained model for deployment.
 
-How it works (high level)
+## Key steps
 
-1. Data cleaning and normalization: remove noise, handle missing values, and normalize text (lowercasing, punctuation removal).
-2. Tokenization and vectorization: convert text to numeric representation using TF-IDF or embeddings depending on the script.
-3. Model training: train a neural network classifier (architecture and hyperparameters are in `Part 3/main.py`).
-4. Evaluation: standard classification metrics (accuracy, precision, recall, F1). The notebook and Part 3 script produce detailed reports.
+1. Data exploration (Part 1): inspect class balance, token distributions, and common tokens.
+2. Cleaning & preprocessing (Part 2): normalize text, remove noise, tokenize, and vectorize (TF-IDF or embeddings).
+3. Model training & evaluation (Part 3): train a neural classifier and evaluate using accuracy, precision/recall, F1, and confusion matrix.
 
-Quick start
+### Part 1 — Data Exploration & Analysis
 
-1. Create and activate a Python virtual environment and install dependencies from the repository root:
+In Part 1 we perform an exploratory data analysis to understand the dataset before cleaning and modeling. The dataset (`hate_dataset.csv` / `hate_speech.csv`) contains two columns:
+
+- `tweet`: raw tweet text
+- `class`: label (0 = Hate Speech, 1 = Offensive Language, 2 = Neither/Neutral)
+
+The EDA includes:
+
+- Class distribution and imbalance checks
+- Token length and distribution plots
+- Frequent token and n-gram analysis per class
+
+## Quick start
+
+1. Create a virtual environment and install dependencies (from repo root):
 
 ```powershell
 python -m venv venv
@@ -35,24 +57,26 @@ python -m venv venv
 pip install -r requirements.txt
 ```
 
-2. Reproduce final training and evaluation:
+2. Run Part 1 (EDA):
 
 ```powershell
-Set-Location -LiteralPath "Hate Speech Detection project"
-python "Part 3\main.py"
+Set-Location -LiteralPath "Hate Speech Detection project\Part 1"
+python main.py
 ```
 
-3. Run inference using the saved model:
+3. Run final training & evaluation (Part 3):
+
+```powershell
+Set-Location -LiteralPath "Hate Speech Detection project\Part 3"
+python main.py
+```
+
+### Inference example
 
 ```python
-from sklearn.externals import joblib
+import joblib
 model = joblib.load('Part 3/hate_speech_model.pkl')
-pred = model.predict(["sample input text"])
+text = "This is a sample tweet to classify"
+pred = model.predict([text])
 print(pred)
 ```
-
-Notes
-
-- The project includes both script and notebook versions of experiments; the notebook (`main.ipynb`) contains analysis and plots.
-- For deployment, wrap the `predict()` call from `Part 3/main.py` in a Flask/FastAPI endpoint.
-
